@@ -3,76 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Metadata Extractor</title>
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-pzjw8f+ua7Kw1TIq0pM1vRggfhPbrlBIIJ6OGpJv3iOVPVzv4UPzY3ODjI89h7+H" crossorigin="anonymous">
+    <title>Forensic Image Metadata Extractor</title>
+    <link rel="stylesheet" href="https://jsdelivr.net">
     <style>
-        body {
-            background-color: #f4f4f9;
-        }
-        .container {
-            max-width: 600px;
-            margin-top: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .result {
-            background-color: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .result h4 {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 14px;
-        }
+        body { background-color: #0f111a; color: #e1e3e6; font-family: system-ui, sans-serif; }
+        .container { max-width: 800px; margin-top: 50px; }
+        .card { background-color: #1a1c24; border: 1px solid #2d3139; border-radius: 12px; }
+        .table { color: #cbd0d6; }
+        .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.02); }
+        .scroll-container { max-height: 400px; overflow-y: auto; border-radius: 6px; }
+        .hash-box { font-family: monospace; background: #0b0c10; padding: 12px; border-radius: 6px; color: #00ffcc; border: 1px solid #1f232b; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>Image Metadata Extractor</h1>
-        <p class="lead">Upload an image to extract its metadata and hash values</p>
+<div class="container mb-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 font-weight-bold text-white">Image Metadata Extractor</h1>
+        <p class="text-muted">Extract EXIF diagnostic metrics and cryptographic signatures from local assets.</p>
     </div>
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="image">Choose Image:</label>
-            <input type="file" class="form-control" name="image" accept="image/*" required>
+    <!-- Upload Panel -->
+    <div class="card shadow p-4 mb-4">
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="image" class="h5 text-white">Select Targeted File Target:</label>
+                <input type="file" class="form-control-file border p-2 text-muted rounded w-100" name="image" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-info btn-block font-weight-bold shadow-sm">Analyze Image Asset</button>
+        </form>
+    </div>
+
+    <!-- Output Processing Logs -->
+    {% if hashes %}
+    <div class="card shadow p-4 mb-4">
+        <h3 class="h5 text-white mb-3">Cryptographic Checksum Hashes</h3>
+        <div class="hash-box">
+            {% for algo, val in hashes.items() %}
+            <div><strong>{{ algo }}:</strong> <span class="text-wrap">{{ val }}</span></div>
+            {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Upload</button>
-    </form>
+    </div>
+    {% endif %}
 
     {% if metadata %}
-        <div class="result">
-            <h4>Metadata:</h4>
-            <pre>{{ metadata }}</pre>
+    <div class="card shadow p-4">
+        <h3 class="h5 text-white mb-3">EXIF Meta Analysis Logs</h3>
+        <div class="scroll-container border border-secondary">
+            <table class="table table-striped table-hover m-0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Metadata Tag Field</th>
+                        <th>Decoded Operational Entry Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tag, value in metadata.items() %}
+                    <tr>
+                        <td class="font-weight-bold text-info">{{ tag }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% endif %}
-
-    {% if hashes %}
-        <div class="result">
-            <h4>Hashes:</h4>
-            <pre>{{ hashes }}</pre>
-        </div>
+    </div>
     {% endif %}
 </div>
-
-<!-- Bootstrap JS, Popper.js -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zybcIY2Q13a7W8bP0WgErhQ9V2yF4m2ECtmG9gf9b" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js" integrity="sha384-OGpamoFVy38t7mMFE6dM4Dk0dSsbK6t9Y+5K/8sgSKyo7TV1D3hX9eVfOj0J72U4" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0pM1vRggfhPbrlBIIJ6OGpJv3iOVPVzv4UPzY3ODjI89h7+H" crossorigin="anonymous"></script>
 
 </body>
 </html>
